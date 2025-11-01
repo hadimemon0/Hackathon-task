@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="ChatGPT Image Nov 1, 2025, 04_19_28 PM.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://hxaljmkdcctkilrwmabr.supabase.co";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4YWxqbWtkY2N0a2lscndtYWJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMzE2OTgsImV4cCI6MjA3NzYwNzY5OH0.uR1JSWmeeoCxqMDkdtOiXxdDcUrRuYivSuDHbWF6B_k";
+
+  const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+</script>
+
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-sm bg-white p-8 rounded-xl shadow-2xl transition-all hover:shadow-3xl transform hover:-translate-y-0.5 border border-gray-100">
+
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">
+            Welcome Back!
+        </h1>
+        <p class="text-center text-gray-500 mb-8">
+            Sign in to access your dashboard.
+        </p>
+
+        <form id="login-form">
+            <div class="mb-5">
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input 
+                    type="email" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    placeholder="you@example.com"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                >
+            </div>
+
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="••••••••"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                >
+            </div>
+
+            <button
+                type="submit" 
+                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300"
+            >
+                Log In
+            </button>
+        </form>
+
+        <div id="message" class="mt-6 p-3 rounded-lg text-center font-medium transition-all duration-300 opacity-0 h-0 overflow-hidden">
+        </div>
+        
+        <!-- Updated Footer: clearer CTAs -->
+        <div class="mt-6 flex flex-col gap-3 text-center">
+            <div class="text-sm text-gray-600">New here?</div>
+            <div class="flex gap-2 justify-center">
+                <button onclick="signup()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">Create an account</button>
+                <button onclick="continueAsGuest()" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition">Continue as guest</button>
+            </div>
+            <div class="text-xs text-gray-400 mt-2">By continuing you agree to our <a href="#" class="text-blue-600">Terms</a> and <a href="#" class="text-blue-600">Privacy Policy</a>.</div>
+        </div>
+
+    </div>
+
+    <script>
+
+        async function signup() {
+    const email = prompt("Enter your email:");
+    const password = prompt("Create a password (min 6 chars):");
+
+    if (!email || !password) return alert('Signup cancelled');
+    if (password.length < 6) return alert('Password must be at least 6 characters');
+
+    const { data, error } = await supa.auth.signUp({
+        email,
+        password
+    });
+
+    if (error) {
+        alert(error.message);
+    } else {
+        alert("Signup done! Check email for confirmation.");
+    }
+}
+
+async function continueAsGuest(){
+  // create an anonymous session using magic link to a throwaway temporary email is one option,
+  // but simplest UX: allow guest and set a flag in sessionStorage
+  sessionStorage.setItem('guest', 'true');
+  window.location.href = 'chatbot.html';
+}
+
+      document.getElementById('login-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const email = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const messageElement = document.getElementById('message');
+
+  const { data, error } = await supa.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    messageElement.textContent = error.message;
+    messageElement.classList.remove('opacity-0', 'h-0');
+    messageElement.classList.add('bg-red-100', 'text-red-800', 'h-auto', 'py-3');
+    return;
+  }
+
+  messageElement.textContent = "Login successful! Redirecting...";
+  messageElement.classList.add('bg-green-100', 'text-green-800', 'h-auto', 'py-3');
+  messageElement.classList.remove('opacity-0', 'h-0');
+
+  setTimeout(() => {
+    window.location.href = "chatbot.html";
+  }, 1000);
+});
+
+
+    </script>
+</body>
+</html>
